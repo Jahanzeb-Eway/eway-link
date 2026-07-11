@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/inquiry_number_generator.dart';
 import '../../theme/app_colors.dart';
 import '../../models/inquiry.dart';
 import '../../services/inquiry_service.dart';
@@ -17,39 +18,45 @@ class InquiryFormScreen extends StatefulWidget {
 class _InquiryFormScreenState
     extends State<InquiryFormScreen> {
 
-  final customerController =
-      TextEditingController();
+final customerController = TextEditingController();
+final addressController = TextEditingController();
+final coordinatorController = TextEditingController();
+final dueDateController = TextEditingController();
+final remarksController = TextEditingController();
+final inquiryNumberController = TextEditingController();
 
-  final addressController =
-      TextEditingController();
+double grandTotal = 0;
 
-  final coordinatorController =
-      TextEditingController();
+ @override
+void initState() {
+  super.initState();
 
-  final dueDateController =
-      TextEditingController();
+  const String currentUser = "Ali";
 
-  final remarksController =
-      TextEditingController();
+  coordinatorController.text = currentUser;
 
-  double grandTotal = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    coordinatorController.text = "Ali";
-  }
+  inquiryNumberController.text =
+      InquiryNumberGenerator.generate();
+}
 
   @override
-  void dispose() {
-    customerController.dispose();
-    addressController.dispose();
-    coordinatorController.dispose();
-    dueDateController.dispose();
-    remarksController.dispose();
-    super.dispose();
-  }
+void dispose() {
+
+  customerController.dispose();
+
+  addressController.dispose();
+
+  coordinatorController.dispose();
+
+  dueDateController.dispose();
+
+  remarksController.dispose();
+
+  inquiryNumberController.dispose();
+
+  super.dispose();
+
+}
 
   Future<void> pickDate() async {
 
@@ -72,49 +79,61 @@ class _InquiryFormScreenState
     }
   }
 
-  Widget buildTextField({
+Widget buildInputField({
+  required String label,
+  required TextEditingController controller,
+  bool readOnly = false,
+  int maxLines = 1,
+  Widget? suffixIcon,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
 
-    required String label,
-
-    required TextEditingController controller,
-
-    int lines = 1,
-
-    bool readOnly = false,
-
-    Widget? suffix,
-
-  }) {
-
-    return TextField(
-
-      controller: controller,
-
-      maxLines: lines,
-
-      readOnly: readOnly,
-
-      decoration: InputDecoration(
-
-        labelText: label,
-
-        suffixIcon: suffix,
-
-        filled: true,
-
-        fillColor: Colors.white,
-
-        border: OutlineInputBorder(
-
-          borderRadius:
-              BorderRadius.circular(12),
-
+      Padding(
+        padding: const EdgeInsets.only(
+          left: 2,
+          bottom: 6,
         ),
-
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
 
-    );
-  }
+      TextField(
+        controller: controller,
+        readOnly: readOnly,
+        maxLines: maxLines,
+        textCapitalization:
+            TextCapitalization.words,
+        style: const TextStyle(
+          fontSize: 15,
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: Colors.white,
+          suffixIcon: suffixIcon,
+          contentPadding:
+              const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
+          border: OutlineInputBorder(
+            borderRadius:
+                BorderRadius.circular(10),
+          ),
+        ),
+      ),
+
+    ],
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +168,12 @@ class _InquiryFormScreenState
 
             Container(
 
-              padding:
-                  const EdgeInsets.all(25),
+padding: const EdgeInsets.fromLTRB(
+  18,
+  16,
+  18,
+  18,
+),
 
               decoration: BoxDecoration(
 
@@ -175,130 +198,92 @@ class _InquiryFormScreenState
 
               child: Column(
 
-                children: [
+children: [
 
-                  Row(
+  const Text(
+    "Customer Information",
+    style: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+    ),
+  ),
 
-                    children: [
+  const SizedBox(height: 16),
 
-                      Expanded(
+const SizedBox(height: 16),
 
-                        child: buildTextField(
+Row(
+  crossAxisAlignment:
+      CrossAxisAlignment.start,
+  children: [
 
-                          label: "Customer Name",
+    Expanded(
+      flex: 3,
+      child: buildInputField(
+        label: "Customer Name",
+        controller: customerController,
+      ),
+    ),
 
-                          controller:
-                              customerController,
+    const SizedBox(width: 16),
 
-                        ),
+    Expanded(
+      flex: 2,
+      child: buildInputField(
+        label: "Coordinator",
+        controller: coordinatorController,
+        readOnly: true,
+      ),
+    ),
 
-                      ),
+    const SizedBox(width: 16),
 
-                      const SizedBox(width:20),
+    Expanded(
+      flex: 2,
+      child: buildInputField(
+        label: "Inquiry No",
+        controller: inquiryNumberController,
+        readOnly: true,
+      ),
+    ),
 
-                      Expanded(
+  ],
+),
 
-                        child: buildTextField(
+                  const SizedBox(height:16),
 
-                          label: "Coordinator",
+Row(
+  crossAxisAlignment:
+      CrossAxisAlignment.start,
+  children: [
 
-                          controller:
-                              coordinatorController,
+    Expanded(
+      flex: 5,
+      child: buildInputField(
+        label: "Customer Address",
+        controller: addressController,
+      ),
+    ),
 
-                        ),
+    const SizedBox(width: 16),
 
-                      ),
+    Expanded(
+      flex: 2,
+      child: buildInputField(
+        label: "Due Date",
+        controller: dueDateController,
+        readOnly: true,
+        suffixIcon: IconButton(
+          icon: const Icon(
+            Icons.calendar_month_outlined,
+          ),
+          onPressed: pickDate,
+        ),
+      ),
+    ),
 
-                      const SizedBox(width:20),
-
-                      Expanded(
-
-                        child: buildTextField(
-
-                          label: "Inquiry No",
-
-                          controller:
-                              TextEditingController(
-                            text:
-                                "INQ-260711-001",
-                          ),
-
-                          readOnly: true,
-
-                        ),
-
-                      ),
-
-                    ],
-
-                  ),
-
-                  const SizedBox(height:20),
-
-                  Row(
-
-                    children: [
-
-                      Expanded(
-
-                        flex:2,
-
-                        child: buildTextField(
-
-                          label:
-                              "Customer Address",
-
-                          controller:
-                              addressController,
-
-                          lines:2,
-
-                        ),
-
-                      ),
-
-                      const SizedBox(width:20),
-
-                      Expanded(
-
-                        child: buildTextField(
-
-                          label:"Due Date",
-
-                          controller:
-                              dueDateController,
-
-                          readOnly:true,
-
-                          suffix: IconButton(
-
-                            icon: const Icon(
-                                Icons.calendar_month),
-
-                            onPressed: pickDate,
-
-                          ),
-
-                        ),
-
-                      ),
-
-                    ],
-
-                  ),
-
-                  const SizedBox(height:20),
-
-                  buildTextField(
-
-                    label:"Remarks",
-
-                    controller:
-                        remarksController,
-
-                    lines:3,
-
-                  ),
+  ],
+),
 
                 ],
 
@@ -306,7 +291,7 @@ class _InquiryFormScreenState
 
             ),
 
-            const SizedBox(height:30),
+            const SizedBox(height:10),
 
             const Text(
 
@@ -314,30 +299,24 @@ class _InquiryFormScreenState
 
               style: TextStyle(
 
-                fontSize:24,
+                fontSize:20,
 
                 fontWeight:
-                    FontWeight.bold,
+                    FontWeight.w600,
 
               ),
 
             ),
 
-            const SizedBox(height:15),
+            const SizedBox(height:10),
 
-            InquiryTable(
-
-              onTotalChanged:(value){
-
-                setState(() {
-
-                  grandTotal=value;
-
-                });
-
-              },
-
-            ),
+InquiryTable(
+  onGrandTotalChanged: (value) {
+    setState(() {
+      grandTotal = value;
+    });
+  },
+),  
 
             const SizedBox(height:25),
 
@@ -494,33 +473,29 @@ class _InquiryFormScreenState
 
                         InquiryService.instance.addInquiry(
 
-                          Inquiry(
+Inquiry(
 
-                            id: DateTime.now()
-                                .millisecondsSinceEpoch
-                                .toString(),
+  id: DateTime.now()
+      .millisecondsSinceEpoch
+      .toString(),
 
-                            customer:
-                                customerController.text,
+  customer: customerController.text,
 
-                            address:
-                                addressController.text,
+  address: addressController.text,
 
-                            coordinator:
-                                coordinatorController.text,
+  coordinator: coordinatorController.text,
 
-                            dueDate:
-                                dueDateController.text,
+  dueDate: dueDateController.text,
 
-                            status: "Pending",
+  status: "Pending",
 
-                            remarks:
-                                remarksController.text,
+  remarks: remarksController.text,
 
-                            grandTotal:
-                                grandTotal,
+  grandTotal: grandTotal,
 
-                          ),
+  items: [],
+
+),
 
                         );
 

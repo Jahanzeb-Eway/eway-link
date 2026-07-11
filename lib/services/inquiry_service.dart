@@ -37,6 +37,7 @@ class InquiryService {
       status: "Completed",
       remarks: old.remarks,
       grandTotal: old.grandTotal,
+      items: _inquiries[index].items,
     );
   }
 }
