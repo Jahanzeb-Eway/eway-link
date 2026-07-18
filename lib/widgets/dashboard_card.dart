@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 class DashboardCard extends StatelessWidget {
   final String title;
   final String value;
@@ -37,7 +35,7 @@ class DashboardCard extends StatelessWidget {
 
               CircleAvatar(
                 radius: 24,
-                backgroundColor: color.withOpacity(.12),
+                backgroundColor: color.withValues(alpha: .12),
                 child: Icon(
                   icon,
                   color: color,

@@ -1,0 +1,88 @@
+EWAY LINK - PRODUCTION PUSH SERVER INSTALLATION
+================================================
+
+The Firebase service-account JSON must remain only in the Supabase secret
+named FIREBASE_SERVICE_ACCOUNT. Never copy it into this project.
+
+INSTALLATION ORDER
+------------------
+
+1. SUPABASE SQL
+
+   Open Supabase Dashboard > SQL Editor > New query.
+   Open the complete file:
+
+   supabase/push_notification_dispatch.sql
+
+   Copy the complete file into the SQL Editor and press Run.
+
+2. DEPLOY THE EDGE FUNCTION
+
+   Open Supabase Dashboard > Edge Functions.
+   Click Deploy a new function > Via Editor.
+   Function name: send-push
+   Keep JWT verification enabled.
+   Replace the editor contents with the complete file:
+
+   supabase/functions/send-push/index.ts
+
+   Click Deploy function.
+
+3. CREATE THE DATABASE WEBHOOK
+
+   Open Supabase Dashboard > Database > Webhooks.
+   Create a new webhook with these values:
+
+   Name: send-push-outbox
+   Table: public.push_outbox
+   Event: INSERT only
+   Type: Supabase Edge Function
+   Edge Function: send-push
+   HTTP method: POST
+   Timeout: 5000 ms or higher
+
+   Select the dashboard option to authenticate the Edge Function request
+   with the project's server secret. Do not disable JWT verification.
+   Save and enable the webhook.
+
+4. REPLACE THE FLUTTER FILES
+
+   Replace these complete project files:
+
+   lib/repositories/inquiry_repository.dart
+   lib/screens/inquiries/inquiry_form_screen.dart
+   lib/services/push_notification_service.dart
+
+   The inquiry coordinator is now selected from real active employee profiles.
+   This supplies the coordinator user ID required to route a push notification
+   to the correct person's registered phone.
+
+5. VERIFY
+
+   Run:
+
+   flutter analyze
+   flutter run
+
+   Test while the recipient's app is in the background:
+
+   - Employee check-in: every active owner receives a push.
+   - Employee checkout: every active owner receives a push.
+   - Inquiry created: selected coordinator receives a push.
+   - Inquiry completed: active owners and inquiry creator receive a push.
+   - Inquiry rejected: active owners and inquiry creator receive a push.
+
+   Delivery records can be inspected in public.push_outbox. A successful row
+   has status = sent and delivered_device_count greater than zero.
+
+SECURITY AND RELIABILITY
+------------------------
+
+- Firebase credentials are read only from Supabase Edge Function secrets.
+- The push outbox is protected by Row Level Security and is not client-readable.
+- Duplicate business events are blocked by a unique dedupe key.
+- Invalid Firebase device tokens are automatically deactivated.
+- Customer Name appears before Inquiry Number in inquiry notification text.
+- Database webhooks are asynchronous, so inquiry and attendance saves are not
+  delayed by Firebase network calls.
+

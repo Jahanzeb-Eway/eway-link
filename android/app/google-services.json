@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "187974308553",
+    "project_id": "eway-link",
+    "storage_bucket": "eway-link.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187974308553:android:19d4d42488b88c92b53318",
+        "android_client_info": {
+          "package_name": "com.eway.ewaylink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoEfoV9xO2qGSsqfWdHwAxn7MX61_c0xg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

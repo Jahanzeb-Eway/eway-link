@@ -1,4 +1,4 @@
-package com.example.eway_link
+package com.eway.ewaylink
 
 import io.flutter.embedding.android.FlutterActivity
 

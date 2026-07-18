@@ -1,0 +1,5 @@
+[functions.send-push]
+verify_jwt = true
+
+[functions.manage-employee]
+verify_jwt = false

@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
 
+class InquiryTableController {
+  _InquiryTableState? _state;
+
+  List<InquiryLine> get lines {
+    return _state?.lines ?? [];
+  }
+
+  double get grandTotal {
+    return _state?._grandTotal ?? 0;
+  }
+
+  void addRow() {
+    _state?.addRow();
+  }
+
+  void clear() {
+    _state?.clearTable();
+  }
+}
+
 class InquiryTable extends StatefulWidget {
+
   final ValueChanged<double> onGrandTotalChanged;
+
+  final InquiryTableController controller;
 
   const InquiryTable({
     super.key,
+    required this.controller,
     required this.onGrandTotalChanged,
   });
 
@@ -80,6 +104,8 @@ class _InquiryTableState
 
   final List<InquiryLine> lines = [];
 
+double _grandTotal = 0;
+
   final List<String> units = [
   "PCS",
   "KG",
@@ -97,14 +123,14 @@ class _InquiryTableState
   "TON",
 ];
 
-  @override
-  void initState() {
+@override
+void initState() {
+  super.initState();
 
-    super.initState();
+  widget.controller._state = this;
 
-    addRow();
-
-  }
+  addRow();
+}
 
   @override
   void dispose() {
@@ -161,19 +187,42 @@ class _InquiryTableState
 
   }
 
-  void calculateGrandTotal() {
+void calculateGrandTotal() {
 
-    double total = 0;
+  _grandTotal = 0;
 
-    for (final line in lines) {
-
-      total += line.total;
-
-    }
-
-    widget.onGrandTotalChanged(total);
-
+  for (final line in lines) {
+    _grandTotal += line.total;
   }
+
+  widget.onGrandTotalChanged(
+    _grandTotal,
+  );
+}
+
+void clearTable() {
+
+  for (final line in lines) {
+
+    line.itemController.clear();
+
+    line.qtyController.clear();
+
+    line.unitController.text = "PCS";
+
+    line.vendorController.clear();
+
+    line.previousRateController.text = "0.00";
+
+    line.rateController.clear();
+
+    line.total = 0;
+  }
+
+  calculateGrandTotal();
+
+  setState(() {});
+}
 
     //====================================================
   // ERP GRID CONTROLS
@@ -261,7 +310,7 @@ Widget unitCell({
       ),
     ),
     child: DropdownButtonFormField<String>(
-      value: line.unitController.text,
+      initialValue: line.unitController.text,
       isExpanded: true,
       decoration: const InputDecoration(
         isDense: true,
@@ -543,40 +592,14 @@ textCell(
 
                 const SizedBox(width: 12),
 
-                OutlinedButton.icon(
-                  onPressed: () {
-
-                    for (final line in lines) {
-
-                      line.itemController.clear();
-
-                      line.qtyController.clear();
-
-                      line.unitController.text = "PCS";
-
-                      line.vendorController.clear();
-
-                      line.previousRateController.text =
-                          "0.00";
-
-                      line.rateController.clear();
-
-                      line.total = 0;
-
-                    }
-
-                    calculateGrandTotal();
-
-                    setState(() {});
-
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text("Clear All"),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize:
-                        const Size(140, 48),
-                  ),
-                ),
+OutlinedButton.icon(
+  onPressed: clearTable,
+  icon: const Icon(Icons.refresh),
+  label: const Text("Clear All"),
+  style: OutlinedButton.styleFrom(
+    minimumSize: const Size(140, 48),
+  ),
+),
 
                 const Spacer(),
 
